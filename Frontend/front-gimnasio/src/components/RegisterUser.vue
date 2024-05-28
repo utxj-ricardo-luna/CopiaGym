@@ -2,10 +2,11 @@
     <div class="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
         <div class="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
             <form action="#">
-                <h1 class="text-2xl xl:text-3xl font-extrabold">
+                <br><br>
+                <h1 class="text-2xl xl:text-4xl font-extrabold">
                     Registrar usuarios
                 </h1>
-                <br>
+                <br><br>
                 <hr></hr>
                     <h1 class="text-2xl xl:text-2xl font-extrabold">Datos personales</h1>
                 <br>
