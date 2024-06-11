@@ -27,7 +27,7 @@
                             <path
                                 d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
                         </svg>
-                        <RouterLink to="/dashboard">
+                        <RouterLink to="/home">
                             <span class="ms-3">Dashboard</span>
                         </RouterLink>
                     </a>
@@ -306,10 +306,7 @@
         </div>
     </aside>
 
-    <div class="p-4 sm:ml-64">
-        <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-            <h1>Bienvenido al sistema</h1>
-        </div>
+    <div class="p-4 sm:ml-64 m-8">
         <router-view />
     </div>
 </template>
