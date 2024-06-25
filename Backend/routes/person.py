@@ -29,7 +29,7 @@ def bienvenida():
 def get_personas():
     return persons
 
-@person.post('/persons', tags=["Personas"])
+@person.post('/persons', tags=["Personas"] )
 
 def save_personas(insert_persons:model_person):
     persons.append(insert_persons)
