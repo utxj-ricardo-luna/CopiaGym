@@ -19,19 +19,19 @@ class model_person(BaseModel):
     created_at:datetime = datetime.now()
     estatus:bool=False
 
-@person.get('/persons')
+@person.get('/persons', tags=["Personas"])
 
 def get_personas():
     return persons
 
-@person.post('/persons')
+@person.post('/persons', tags=["Personas"] )
 
 def save_personas(insert_persons:model_person):
     persons.append(insert_persons)
     print (insert_persons)
     return "Datos guardados"
 
-@person.post('/person/{person_id}')
+@person.post('/person/{person_id}', tags=["Personas"])
 
 def get_persona(person_id: str):
     for person in persons:
@@ -39,7 +39,7 @@ def get_persona(person_id: str):
             return person
     return "No existe el registro"
 
-@person.delete('/person/{person_id}')
+@person.delete('/person/{person_id}', tags=["Personas"])
 
 def delete_persona(person_id: str):
     for person in persons:
@@ -48,7 +48,7 @@ def delete_persona(person_id: str):
             return "Registro eliminado correctamente"
     return "Registro no encontrado"
 
-@person.put('/person/{person_id}')
+@person.put('/person/{person_id}', tags=["Personas"])
 
 def update_persona(person_id: str, updateperson: model_person):
     for person in persons:
