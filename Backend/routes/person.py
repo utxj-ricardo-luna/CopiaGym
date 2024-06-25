@@ -19,6 +19,11 @@ class model_person(BaseModel):
     created_at:datetime = datetime.now()
     estatus:bool=False
 
+@person.get('/')
+
+def bienvenida():
+    return "Bienvenido al sistema de apis"
+
 @person.get('/persons', tags=["Personas"])
 
 def get_personas():
