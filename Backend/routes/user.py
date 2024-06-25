@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from datetime import datetime
+from config.db import conn
+from models.users import users
 
 user = APIRouter()
 users = []
@@ -22,6 +24,11 @@ def bienvenida():
 
 def get_usuarios():
     return users
+
+@user.get('/users_all', tags=["Usuarios"])
+
+def get_usuarios_all():
+    return conn.execute(users.select()).fetchall()
 
 @user.post('/users', tags=["Usuarios"])
 
