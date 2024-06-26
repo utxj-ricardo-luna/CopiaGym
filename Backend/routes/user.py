@@ -1,71 +1,73 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
-from datetime import datetime
 from config.db import conn
 from models.users import users
-from models import tb_users
+from schemas.users import Users
+from cryptography.fernet import Fernet
+
+key=Fernet.generate_key()
+f = Fernet(key)
 
 user = APIRouter()
-users = []
+#users = [] 
 
 #usersModel
-class model_user(BaseModel):
-    id:str
-    usuario:str
-    contrasena: str
-    created_at:datetime = datetime.now()
-    estatus:bool=False
+#class model_user(BaseModel):
+#    id:str
+#    usuario:str
+#    contrasena: str
+#    created_at: datetime = datetime.now()
+#    estatus:bool=False
 
-@user.get('/')
+#@user.get('/users', tags=["Usuarios"])
 
-def bienvenida():
-    return "Bienvenido al sistema de apis"
+#def get_usuarios():
+#    return users
 
 @user.get('/users', tags=["Usuarios"])
 
 def get_usuarios():
-    return users
-@user.get('/users_all', tags=["Usuarios"])
-
-def get_usuarios_all():
-    return conn.execute(tb_users.select()).fecthall()
-
-@user.get('/users_all', tags=["Usuarios"])
-
-def get_usuarios_all():
     return conn.execute(users.select()).fetchall()
+
+#@user.post('/users', tags=["Usuarios"])
+
+#def save_usuarios(insert_users:model_user):
+#    users.append(insert_users)
+#    print (insert_users)
+#    return "Datos guardados"
 
 @user.post('/users', tags=["Usuarios"])
 
-def save_usuarios(insert_users:model_user):
-    users.append(insert_users)
-    print (insert_users)
-    return "Datos guardados"
+def save_usuarios(useradd:Users):
+    new_user={"usuario":useradd.usuario,"created_at":useradd.created_at, "estatus":useradd.estatus, "Id_persona":useradd.Id_persona}
+    new_user["password"]=f.encrypt(useradd.password.encode("utf-8"))
+    result = conn.execute(users.insert().values(new_user))
+    print (result)
+    return "ok g"#conn.execute(users.select().where(users.c.id == result.lastrowid)).first()
 
-@user.post('/user/{user_id}', tags=["Usuarios"])
+#@user.post('/user/{user_id}', tags=["Usuarios"])
 
-def get_usuario(user_id: str):
-    for user in users:
-        if user.id== user_id:
-            return user
-    return "No existe el registro"
+#def get_usuario(user_id: str):
+#    for user in users:
+#        if user.id== user_id:
+#            return user
+#    return "No existe el registro"
 
-@user.delete('/user/{user_id}', tags=["Usuarios"])
+#@user.delete('/user/{user_id}', tags=["Usuarios"])
 
-def delete_usuario(user_id: str):
-    for user in users:
-        if user.id == user_id:
-            users.remove(user)
-            return "Registro eliminado correctamente"
-    return "Registro no encontrado"
+#def delete_usuario(user_id: str):
+#    for user in users:
+#        if user.id == user_id:
+#            users.remove(user)
+#            return "Registro eliminado correctamente"
+#    return "Registro no encontrado"
 
-@user.put('/user/{user_id}', tags=["Usuarios"])
+#@user.put('/user/{user_id}', tags=["Usuarios"])
 
-def update_usuario(user_id: str, updateUser: model_user):
-    for user in users:
-        if user.id == user_id:
-            user.usuario=updateUser.usuario
-            user.contrasena=updateUser.contrasena
-            user.estatus=updateUser.estatus
-            return "Registro actualizado correctamente"
-    return "Registro no encontrado"
+#def update_usuario(user_id: str, updateUser: model_user):
+#    for user in users:
+#        if user.id == user_id:
+#            user.usuario=updateUser.usuario
+#            user.contrasena=updateUser.contrasena
+#            user.estatus=updateUser.estatus
+#            return "Registro actualizado correctamente"
+#    return "Registro no encontrado"
