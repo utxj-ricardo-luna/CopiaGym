@@ -1,15 +1,15 @@
-from sqlalchemy import Table, Column
-from sqlalchemy.sql.sqltypes import Integer, String, Boolean, DateTime
-from config.db import meta,engine
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy.orm import relationship
+from config.db import Base
 
-users = Table("users", meta,
-                 Column("id", Integer, primary_key=True),
-                 Column("usuario", String(255)),
-                 Column("password",String(255)),
-                 Column("created_at", DateTime(timezone=True), default=func.now()),
-                 Column("estatus", Boolean(False)),
-                 Column("Id_persona", Integer)
-                 )
+class User(Base):
+    __tablename__ = "users"
 
-meta.create_all(engine)
+    id = Column(Integer, primary_key=True, index=True)
+    usuario = Column(String(255))
+    password = Column(LONGTEXT)
+    created_at = Column(DateTime)
+    estatus = Column(Boolean, default=False)
+    Id_persona = Column(Integer)
+    #items = relationship("Item", back_populates="owner")

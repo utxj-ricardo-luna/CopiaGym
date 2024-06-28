@@ -1,11 +1,24 @@
-from typing import Optional
+from typing import List, Union
 from pydantic import BaseModel
 from datetime import datetime
 
-class Users(BaseModel):
-    id:Optional[int]
+class UserBase(BaseModel):
     usuario: str
     password: str
-    created_at: str
+    created_at: datetime
     estatus: bool
     Id_persona: int
+
+class UserCreate(UserBase):
+    pass
+
+class UserUpdate(UserBase):
+    pass
+
+class User(UserBase):
+    id: int
+    #owner_id: int clave foranea
+    class Config:
+        orm_mode = True
+
+

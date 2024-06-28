@@ -1,73 +1,52 @@
-from fastapi import APIRouter
-from config.db import conn
-from models.users import users
-from schemas.users import Users
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
 from cryptography.fernet import Fernet
+import crud.users, config.db, schemas.users, models.users
+from typing import List
 
 key=Fernet.generate_key()
 f = Fernet(key)
 
 user = APIRouter()
-#users = [] 
 
-#usersModel
-#class model_user(BaseModel):
-#    id:str
-#    usuario:str
-#    contrasena: str
-#    created_at: datetime = datetime.now()
-#    estatus:bool=False
+models.users.Base.metadata.create_all(bind=config.db.engine)
 
-#@user.get('/users', tags=["Usuarios"])
+def get_db():
+    db = config.db.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-#def get_usuarios():
-#    return users
+@user.get("/users/", response_model=List[schemas.users.User], tags=["Usuarios"])
+def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    db_users= crud.users.get_users(db=db, skip=skip, limit=limit)
+    return db_users
 
-@user.get('/users', tags=["Usuarios"])
+@user.post("/user/{id}", response_model=schemas.users.User, tags=["Usuarios"])
+def read_user(id: int, db: Session = Depends(get_db)):
+    db_user= crud.users.get_user(db=db, id=id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
 
-def get_usuarios():
-    return conn.execute(users.select()).fetchall()
+@user.post("/users/", response_model=schemas.users.User, tags=["Usuarios"])
+def create_user(user: schemas.users.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.users.get_user_by_usuario(db, usuario=user.usuario)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Usuario existente intenta nuevamente")
+    return crud.users.create_user(db=db, user=user)
 
-#@user.post('/users', tags=["Usuarios"])
+@user.put("/user/{id}", response_model=schemas.users.User, tags=["Usuarios"])
+def update_user(id: int, user: schemas.users.UserUpdate, db: Session = Depends(get_db)):
+    db_user = crud.users.update_user(db=db, id=id, user=user)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="Usuario no existe, no actualizado")
+    return db_user
 
-#def save_usuarios(insert_users:model_user):
-#    users.append(insert_users)
-#    print (insert_users)
-#    return "Datos guardados"
-
-@user.post('/users', tags=["Usuarios"])
-
-def save_usuarios(useradd:Users):
-    new_user={"usuario":useradd.usuario,"created_at":useradd.created_at, "estatus":useradd.estatus, "Id_persona":useradd.Id_persona}
-    new_user["password"]=f.encrypt(useradd.password.encode("utf-8"))
-    result = conn.execute(users.insert().values(new_user))
-    print (result)
-    return "ok g"#conn.execute(users.select().where(users.c.id == result.lastrowid)).first()
-
-#@user.post('/user/{user_id}', tags=["Usuarios"])
-
-#def get_usuario(user_id: str):
-#    for user in users:
-#        if user.id== user_id:
-#            return user
-#    return "No existe el registro"
-
-#@user.delete('/user/{user_id}', tags=["Usuarios"])
-
-#def delete_usuario(user_id: str):
-#    for user in users:
-#        if user.id == user_id:
-#            users.remove(user)
-#            return "Registro eliminado correctamente"
-#    return "Registro no encontrado"
-
-#@user.put('/user/{user_id}', tags=["Usuarios"])
-
-#def update_usuario(user_id: str, updateUser: model_user):
-#    for user in users:
-#        if user.id == user_id:
-#            user.usuario=updateUser.usuario
-#            user.contrasena=updateUser.contrasena
-#            user.estatus=updateUser.estatus
-#            return "Registro actualizado correctamente"
-#    return "Registro no encontrado"
+@user.delete("/user/{id}", response_model=schemas.users.User, tags=["Usuarios"])
+def delete_user(id: int, db: Session = Depends(get_db)):
+    db_user = crud.users.delete_user(db=db, id=id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="Usuario no existe, no se pudo eliminar")
+    return db_user
